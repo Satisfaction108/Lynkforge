@@ -1,5 +1,5 @@
 /**
- * Core type definitions for LinkForge
+ * Core type definitions for Lynkforge
  */
 
 /**

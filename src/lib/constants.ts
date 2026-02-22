@@ -2,7 +2,7 @@
  * Application constants
  */
 
-export const APP_NAME = "LinkForge";
+export const APP_NAME = "Lynkforge";
 export const APP_DESCRIPTION =
   "Your links. Your brand. 100% free. The link-in-bio tool that gives you everything for free.";
 export const APP_URL =

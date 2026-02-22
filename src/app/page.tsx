@@ -69,7 +69,7 @@ export default function Home() {
 
             {/* Social proof */}
             <p className="mt-8 text-sm text-slate-500">
-              Join 10,000+ creators already using LinkForge
+              Join 10,000+ creators already using Lynkforge
             </p>
           </div>
         </section>
@@ -102,7 +102,7 @@ export default function Home() {
                 {
                   title: "No Branding",
                   description:
-                    "Your page, your brand. No LinkForge watermark.",
+                    "Your page, your brand. No Lynkforge watermark.",
                   icon: "✨",
                 },
                 {
