@@ -101,3 +101,51 @@ export async function getSession() {
   return session;
 }
 
+/**
+ * Send password reset email
+ */
+export async function resetPassword(email: string): Promise<AuthResult> {
+  const supabase = await createClient();
+  const headersList = await headers();
+  const origin = headersList.get("origin") || process.env.NEXT_PUBLIC_APP_URL;
+
+  const { error } = await supabase.auth.resetPasswordForEmail(email, {
+    redirectTo: `${origin}/auth/callback?next=/reset-password`,
+  });
+
+  if (error) {
+    return {
+      success: false,
+      error: error.message,
+    };
+  }
+
+  return {
+    success: true,
+    message: "Password reset email sent!",
+  };
+}
+
+/**
+ * Update password (after reset)
+ */
+export async function updatePassword(password: string): Promise<AuthResult> {
+  const supabase = await createClient();
+
+  const { error } = await supabase.auth.updateUser({
+    password,
+  });
+
+  if (error) {
+    return {
+      success: false,
+      error: error.message,
+    };
+  }
+
+  return {
+    success: true,
+    message: "Password updated successfully!",
+  };
+}
+
