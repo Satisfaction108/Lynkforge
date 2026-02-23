@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
+import { OAuthButtons } from "@/components/auth/OAuthButtons";
 import { APP_NAME, ROUTES } from "@/lib/constants";
 import { signIn, signUp } from "@/lib/actions/auth";
 import {
@@ -114,6 +115,19 @@ export function AuthForm({ mode }: AuthFormProps) {
             ? "Sign in to manage your links"
             : "Create your free account today"}
         </p>
+      </div>
+
+      {/* OAuth Buttons */}
+      <OAuthButtons mode={mode} />
+
+      {/* Divider */}
+      <div className="relative my-6">
+        <div className="absolute inset-0 flex items-center">
+          <div className="w-full border-t border-slate-200" />
+        </div>
+        <div className="relative flex justify-center text-sm">
+          <span className="bg-white px-4 text-slate-500">or continue with email</span>
+        </div>
       </div>
 
       {/* Form */}
