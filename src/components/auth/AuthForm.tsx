@@ -2,29 +2,30 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { APP_NAME, ROUTES } from "@/lib/constants";
+import { signIn, signUp } from "@/lib/actions/auth";
 import {
   loginSchema,
   signupSchema,
   getPasswordStrength,
-  type LoginFormData,
-  type SignupFormData,
 } from "@/lib/validations/auth";
 
 interface AuthFormProps {
   mode: "login" | "signup";
-  onSubmit?: (data: LoginFormData | SignupFormData) => Promise<void>;
 }
 
-export function AuthForm({ mode, onSubmit }: AuthFormProps) {
+export function AuthForm({ mode }: AuthFormProps) {
+  const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [generalError, setGeneralError] = useState("");
+  const [successMessage, setSuccessMessage] = useState("");
 
   const isLogin = mode === "login";
   const passwordStrength = !isLogin ? getPasswordStrength(password) : null;
@@ -33,6 +34,7 @@ export function AuthForm({ mode, onSubmit }: AuthFormProps) {
     e.preventDefault();
     setErrors({});
     setGeneralError("");
+    setSuccessMessage("");
 
     // Validate form data
     const formData = isLogin
@@ -44,7 +46,7 @@ export function AuthForm({ mode, onSubmit }: AuthFormProps) {
 
     if (!result.success) {
       const fieldErrors: Record<string, string> = {};
-      result.error.errors.forEach((err) => {
+      result.error.issues.forEach((err) => {
         const field = err.path[0] as string;
         if (!fieldErrors[field]) {
           fieldErrors[field] = err.message;
@@ -57,12 +59,22 @@ export function AuthForm({ mode, onSubmit }: AuthFormProps) {
     // Submit form
     setIsLoading(true);
     try {
-      if (onSubmit) {
-        await onSubmit(result.data);
+      if (isLogin) {
+        const authResult = await signIn(email, password);
+        if (authResult.success) {
+          // Redirect to dashboard on successful login
+          router.push(ROUTES.DASHBOARD);
+          router.refresh();
+        } else {
+          setGeneralError(authResult.error || "Failed to sign in");
+        }
       } else {
-        // TODO: Implement actual auth logic in Day 5
-        console.log("Form submitted:", result.data);
-        await new Promise((resolve) => setTimeout(resolve, 1000));
+        const authResult = await signUp(email, password);
+        if (authResult.success) {
+          setSuccessMessage(authResult.message || "Check your email to confirm your account!");
+        } else {
+          setGeneralError(authResult.error || "Failed to create account");
+        }
       }
     } catch (error) {
       setGeneralError(
@@ -106,6 +118,17 @@ export function AuthForm({ mode, onSubmit }: AuthFormProps) {
 
       {/* Form */}
       <form onSubmit={handleSubmit} className="space-y-5">
+        {successMessage && (
+          <div className="rounded-lg bg-emerald-50 p-4 text-sm text-emerald-600">
+            <div className="flex items-center gap-2">
+              <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              {successMessage}
+            </div>
+          </div>
+        )}
+
         {generalError && (
           <div className="rounded-lg bg-red-50 p-4 text-sm text-red-600">
             {generalError}
